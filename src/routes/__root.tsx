@@ -6,13 +6,9 @@ import {
   Scripts,
   createRootRoute,
 } from "@tanstack/react-router"
-import { Suspense, lazy } from "react"
+import { VercelAnalytics } from "@/components/vercel-analytics"
 import { siteMetadata } from "@/config/site"
 import appCss from "../styles.css?url"
-
-const Analytics = lazy(() =>
-  import("@vercel/analytics/react").then((m) => ({ default: m.Analytics })),
-)
 
 const structuredData = {
   "@context": "https://schema.org",
@@ -115,9 +111,7 @@ function RootComponent() {
         <div className="relative isolate min-h-svh">
           <Outlet />
         </div>
-        <Suspense fallback={null}>
-          <Analytics />
-        </Suspense>
+        <VercelAnalytics />
         <Scripts />
       </body>
     </html>
