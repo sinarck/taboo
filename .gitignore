@@ -2,9 +2,12 @@
 
 # dependencies
 /node_modules
+/.pnpm-store/
 
-# next.js
+# build output
 /.next/
+/.output/
+/.tanstack/
 /out/
 
 # production
