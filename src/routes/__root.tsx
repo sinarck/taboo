@@ -6,7 +6,7 @@ import {
   Scripts,
   createRootRoute,
 } from "@tanstack/react-router"
-import { VercelAnalytics } from "@/components/vercel-analytics"
+import { Analytics } from "@vercel/analytics/react"
 import { siteMetadata } from "@/config/site"
 import appCss from "../styles.css?url"
 
@@ -111,7 +111,7 @@ function RootComponent() {
         <div className="relative isolate min-h-svh">
           <Outlet />
         </div>
-        <VercelAnalytics />
+        <Analytics />
         <Scripts />
       </body>
     </html>
