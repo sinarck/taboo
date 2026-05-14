@@ -1,0 +1,14 @@
+<svg width="180" height="180" viewBox="0 0 180 180" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Taboo">
+  <style>
+    .bg { fill: #0a0a0a; }
+    .fg { fill: #fafafa; }
+    .accent { fill: #ef4444; }
+    @media (prefers-color-scheme: light) {
+      .bg { fill: #fafafa; }
+      .fg { fill: #0a0a0a; }
+    }
+  </style>
+  <rect class="bg" width="180" height="180" rx="40" />
+  <path class="fg" d="M48 50 H132 V72 H102 V140 H78 V72 H48 Z" />
+  <rect class="accent" x="30" y="84" width="120" height="18" rx="9" transform="rotate(-12 90 93)" />
+</svg>
