@@ -128,13 +128,17 @@ export const useGameStore = create<GameState>()(
       name: "taboo-game-storage",
       version: 6,
       storage: createJSONStorage(() => localStorage),
+      // Strip dropped fields (endAt, pausedMs, isPaused) from older persisted
+      // shapes and force gameStarted to false — round state isn't recoverable
+      // across reloads now that the timer lives in react state.
       migrate: (persistedState) => {
         if (!persistedState || typeof persistedState !== "object") return persistedState;
-        const { endAt, pausedMs, isPaused, gameStarted, ...rest } = persistedState as Record<
-          string,
-          unknown
-        >;
-        return { ...rest, gameStarted: false };
+        const legacyKeys = new Set(["endAt", "pausedMs", "isPaused", "gameStarted"]);
+        const next: Record<string, unknown> = { gameStarted: false };
+        for (const [key, value] of Object.entries(persistedState as Record<string, unknown>)) {
+          if (!legacyKeys.has(key)) next[key] = value;
+        }
+        return next;
       },
     },
   ),
