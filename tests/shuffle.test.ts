@@ -31,10 +31,11 @@ describe("shuffle", () => {
     // Track how often each value lands in position 0 across many shuffles.
     const input = [0, 1, 2, 3, 4];
     const trials = 20_000;
-    const counts = new Array(input.length).fill(0);
+    const counts = Array.from({ length: input.length }, () => 0);
     for (let i = 0; i < trials; i++) {
-      const out = shuffle(input);
-      counts[out[0] as number]++;
+      const winner = shuffle(input)[0];
+      if (winner === undefined) continue;
+      counts[winner] = (counts[winner] ?? 0) + 1;
     }
     // Expect each value to land in position 0 ≈ trials / input.length times.
     const expected = trials / input.length;
