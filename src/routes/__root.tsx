@@ -1,28 +1,12 @@
 /// <reference types="vite/client" />
 
-import {
-  HeadContent,
-  Outlet,
-  Scripts,
-  createRootRoute,
-} from "@tanstack/react-router"
-import { Analytics } from "@vercel/analytics/react"
-import { siteMetadata } from "@/config/site"
-import appCss from "../styles.css?url"
+import { HeadContent, Outlet, Scripts, createRootRoute } from "@tanstack/react-router";
+import { Analytics } from "@vercel/analytics/react";
+import { siteMetadata } from "@/config/site";
+import { structuredData } from "@/config/structured-data";
+import appCss from "../styles.css?url";
 
-const structuredData = {
-  "@context": "https://schema.org",
-  "@type": "Game",
-  name: siteMetadata.name,
-  description: siteMetadata.description,
-  url: siteMetadata.origin,
-  image: `${siteMetadata.origin}${siteMetadata.socialImage.path}`,
-  applicationCategory: "GameApplication",
-  genre: "Party",
-  numberOfPlayers: { "@type": "QuantitativeValue", minValue: 2, maxValue: 8 },
-  operatingSystem: "Web Browser",
-  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
-}
+const ogImageUrl = `${siteMetadata.origin}${siteMetadata.socialImage.path}`;
 
 export const Route = createRootRoute({
   head: () => ({
@@ -36,9 +20,10 @@ export const Route = createRootRoute({
       { name: "description", content: siteMetadata.description },
       { name: "keywords", content: siteMetadata.keywords.join(", ") },
       { name: "robots", content: siteMetadata.robots },
+      { name: "googlebot", content: siteMetadata.robots },
       { name: "author", content: siteMetadata.name },
       { name: "application-name", content: siteMetadata.name },
-      { name: "apple-mobile-web-app-title", content: siteMetadata.name },
+      { name: "apple-mobile-web-app-title", content: siteMetadata.shortTitle },
       { name: "apple-mobile-web-app-capable", content: "yes" },
       { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
       { name: "mobile-web-app-capable", content: "yes" },
@@ -57,24 +42,19 @@ export const Route = createRootRoute({
       { property: "og:type", content: "website" },
       { property: "og:site_name", content: siteMetadata.name },
       { property: "og:locale", content: siteMetadata.locale },
-      { property: "og:title", content: siteMetadata.title },
+      { property: "og:title", content: siteMetadata.socialTitle },
       { property: "og:description", content: siteMetadata.description },
       { property: "og:url", content: siteMetadata.origin },
-      {
-        property: "og:image",
-        content: `${siteMetadata.origin}${siteMetadata.socialImage.path}`,
-      },
+      { property: "og:image", content: ogImageUrl },
+      { property: "og:image:secure_url", content: ogImageUrl },
       { property: "og:image:width", content: String(siteMetadata.socialImage.width) },
       { property: "og:image:height", content: String(siteMetadata.socialImage.height) },
       { property: "og:image:alt", content: siteMetadata.socialImage.alt },
       { property: "og:image:type", content: siteMetadata.socialImage.type },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: siteMetadata.title },
+      { name: "twitter:title", content: siteMetadata.socialTitle },
       { name: "twitter:description", content: siteMetadata.description },
-      {
-        name: "twitter:image",
-        content: `${siteMetadata.origin}${siteMetadata.socialImage.path}`,
-      },
+      { name: "twitter:image", content: ogImageUrl },
       { name: "twitter:image:alt", content: siteMetadata.socialImage.alt },
     ],
     links: [
@@ -84,6 +64,7 @@ export const Route = createRootRoute({
       { rel: "icon", href: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
       { rel: "apple-touch-icon", href: "/apple-touch-icon.png", sizes: "180x180" },
       { rel: "manifest", href: "/site.webmanifest" },
+      { rel: "sitemap", href: "/sitemap.xml", type: "application/xml" },
     ],
     scripts: [
       {
@@ -93,7 +74,7 @@ export const Route = createRootRoute({
     ],
   }),
   component: RootComponent,
-})
+});
 
 function RootComponent() {
   return (
@@ -115,5 +96,5 @@ function RootComponent() {
         <Scripts />
       </body>
     </html>
-  )
+  );
 }
