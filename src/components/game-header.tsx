@@ -1,17 +1,17 @@
-"use client"
+"use client";
 
-import { Gear, Question } from "@phosphor-icons/react"
-import { Button } from "@/components/ui/button"
-import { formatGameTime } from "@/utils/time"
+import { GearIcon, QuestionIcon } from "@phosphor-icons/react";
+import { Button } from "@/components/ui/button";
+import { formatGameTime } from "@/utils/time";
 
 type GameHeaderProps = {
-  gameStarted: boolean
-  hasPlayed: boolean
-  activeTeamName: string | undefined
-  timeRemaining: number
-  onOpenSettings: () => void
-  onOpenHelp: () => void
-}
+  gameStarted: boolean;
+  hasPlayed: boolean;
+  activeTeamName: string | undefined;
+  timeRemaining: number;
+  onOpenSettings: () => void;
+  onOpenHelp: () => void;
+};
 
 export function GameHeader({
   gameStarted,
@@ -21,7 +21,7 @@ export function GameHeader({
   onOpenSettings,
   onOpenHelp,
 }: GameHeaderProps) {
-  const label = hasPlayed ? (activeTeamName ?? "Taboo") : "Taboo"
+  const label = hasPlayed ? (activeTeamName ?? "Taboo") : "Taboo";
 
   return (
     <header className="mb-10 flex items-center justify-between lg:mb-8">
@@ -36,13 +36,8 @@ export function GameHeader({
             {formatGameTime(timeRemaining)}
           </span>
         ) : null}
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={onOpenHelp}
-          aria-label="How to play"
-        >
-          <Question className="size-4" weight="regular" />
+        <Button variant="ghost" size="icon" onClick={onOpenHelp} aria-label="How to play">
+          <QuestionIcon className="size-4" weight="regular" />
         </Button>
         <Button
           variant="ghost"
@@ -51,9 +46,9 @@ export function GameHeader({
           onClick={onOpenSettings}
           aria-label="Open settings"
         >
-          <Gear className="size-4" weight="regular" />
+          <GearIcon className="size-4" weight="regular" />
         </Button>
       </div>
     </header>
-  )
+  );
 }

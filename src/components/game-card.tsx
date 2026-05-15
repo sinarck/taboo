@@ -1,15 +1,15 @@
-"use client"
+"use client";
 
-import type { TabooCard } from "@/data/taboo-cards"
+import type { TabooCard } from "@/data/taboo-cards";
 
 interface GameCardProps {
-  card: TabooCard
+  card: TabooCard;
 }
 
 export function GameCard({ card }: GameCardProps) {
   return (
     <article className="text-center">
-      <h2 className="text-4xl font-semibold tracking-tight text-balance break-words sm:text-5xl">
+      <h2 className="text-4xl font-semibold tracking-tight text-balance wrap-break-word sm:text-5xl">
         {card.word}
       </h2>
 
@@ -27,5 +27,5 @@ export function GameCard({ card }: GameCardProps) {
         ))}
       </ul>
     </article>
-  )
+  );
 }
