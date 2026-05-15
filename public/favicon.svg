@@ -1,14 +1,1 @@
-<svg width="180" height="180" viewBox="0 0 180 180" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Taboo">
-  <style>
-    .bg { fill: #0a0a0a; }
-    .fg { fill: #fafafa; }
-    .accent { stroke: #ef4444; }
-    @media (prefers-color-scheme: light) {
-      .bg { fill: #fafafa; }
-      .fg { fill: #0a0a0a; }
-    }
-  </style>
-  <rect class="bg" fill="#0a0a0a" width="180" height="180" rx="40" />
-  <path class="fg" fill="#fafafa" d="M44 50 H136 V74 H101 V140 H79 V74 H44 Z" />
-  <path class="accent" stroke="#ef4444" d="M 34 146 L 146 34" stroke-width="22" stroke-linecap="round" fill="none" />
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="180" height="180" aria-label="Taboo" role="img" viewBox="0 0 180 180"><style>.bg{fill:#0a0a0a}.fg{fill:#fafafa}.accent{stroke:#ef4444}@media (prefers-color-scheme:light){.bg{fill:#fafafa}.fg{fill:#0a0a0a}}</style><rect width="180" height="180" fill="#0a0a0a" class="bg" rx="40"/><path fill="#fafafa" d="M44 50 H136 V74 H101 V140 H79 V74 H44 Z" class="fg"/><path fill="none" stroke="#ef4444" stroke-linecap="round" stroke-width="22" d="M 34 146 L 146 34" class="accent"/></svg>
