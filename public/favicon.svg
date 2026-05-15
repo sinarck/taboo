@@ -2,13 +2,13 @@
   <style>
     .bg { fill: #0a0a0a; }
     .fg { fill: #fafafa; }
-    .accent { fill: #ef4444; }
+    .accent { stroke: #ef4444; }
     @media (prefers-color-scheme: light) {
       .bg { fill: #fafafa; }
       .fg { fill: #0a0a0a; }
     }
   </style>
-  <rect class="bg" width="180" height="180" rx="40" />
-  <path class="fg" d="M48 50 H132 V72 H102 V140 H78 V72 H48 Z" />
-  <rect class="accent" x="30" y="84" width="120" height="18" rx="9" transform="rotate(-12 90 93)" />
+  <rect class="bg" fill="#0a0a0a" width="180" height="180" rx="40" />
+  <path class="fg" fill="#fafafa" d="M44 50 H136 V74 H101 V140 H79 V74 H44 Z" />
+  <path class="accent" stroke="#ef4444" d="M 34 146 L 146 34" stroke-width="22" stroke-linecap="round" fill="none" />
 </svg>
