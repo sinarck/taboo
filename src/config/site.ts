@@ -1,21 +1,32 @@
 export const siteMetadata = {
   origin: import.meta.env.VITE_SITE_URL ?? "https://taboo.aadisanghvi.com",
   name: "Taboo",
+  shortTitle: "Taboo",
   title: "Taboo",
+  socialTitle: "Taboo",
+  tagline: "The forbidden word party game",
   description:
-    "Play Taboo online with friends. Describe the word on the card without using any of the forbidden words. Free, fast, and built for the table.",
+    "Play Taboo online. Get your team to guess the word on the card without using any of the five forbidden words. Built for parties, family nights, and the office.",
+  shortDescription: "Play Taboo online. Guess the word without using the five forbidden words.",
   themeColorLight: "#fafafa",
   themeColorDark: "#0a0a0a",
   locale: "en_US",
   category: "game",
   keywords: [
     "taboo",
+    "taboo game",
+    "play taboo",
+    "taboo online",
+    "online taboo",
     "word game",
     "party game",
     "guessing game",
-    "online taboo",
-    "play taboo",
+    "team game",
+    "family game",
     "forbidden words",
+    "word card game",
+    "browser game",
+    "taboo cards",
   ],
   socialImage: {
     path: "/og-image.png",
@@ -24,9 +35,8 @@ export const siteMetadata = {
     height: 630,
     type: "image/png",
   },
-  robots:
-    "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
-} as const
+  robots: "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+} as const;
 
 export const formatTitle = (page?: string) =>
-  page ? `${page} | ${siteMetadata.name}` : siteMetadata.title
+  page ? `${page} | ${siteMetadata.name}` : siteMetadata.title;
