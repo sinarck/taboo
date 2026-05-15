@@ -1,14 +1,16 @@
-"use client"
+"use client";
 
-import { useHotkeys } from "@tanstack/react-hotkeys"
+import { useHotkeys } from "@tanstack/react-hotkeys";
 
 interface UseGameKeyboardProps {
-  onCorrect: () => void
-  onSkip: () => void
-  onPause: () => void
-  onOpenHelp: () => void
-  gameStarted: boolean
-  isPaused: boolean
+  onCorrect: () => void;
+  onSkip: () => void;
+  onPause: () => void;
+  onOpenHelp: () => void;
+  onStartRound: () => void;
+  onPreviewPrevious: () => void;
+  gameStarted: boolean;
+  isPaused: boolean;
 }
 
 export function useGameKeyboard({
@@ -16,17 +18,25 @@ export function useGameKeyboard({
   onSkip,
   onPause,
   onOpenHelp,
+  onStartRound,
+  onPreviewPrevious,
   gameStarted,
   isPaused,
 }: UseGameKeyboardProps) {
   useHotkeys(
     [
+      // Space doubles as the primary action: mark correct during a round,
+      // start the round otherwise. Disabled when paused so the player can't
+      // score a card they can't see.
       {
         hotkey: "Space",
-        callback: onCorrect,
+        callback: () => (gameStarted ? onCorrect() : onStartRound()),
         options: {
-          enabled: gameStarted && !isPaused,
-          meta: { name: "Correct", description: "Mark the current card as correct" },
+          enabled: !isPaused,
+          meta: {
+            name: "Correct",
+            description: "Mark the current card as correct or start a round",
+          },
         },
       },
       {
@@ -46,6 +56,14 @@ export function useGameKeyboard({
         },
       },
       {
+        hotkey: "Backspace",
+        callback: onPreviewPrevious,
+        options: {
+          enabled: gameStarted && isPaused,
+          meta: { name: "Previous", description: "Preview the previous card" },
+        },
+      },
+      {
         hotkey: { key: "/", shift: true },
         callback: onOpenHelp,
         options: {
@@ -54,5 +72,5 @@ export function useGameKeyboard({
       },
     ],
     { requireReset: true },
-  )
+  );
 }
