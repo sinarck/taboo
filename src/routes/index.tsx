@@ -1,71 +1,99 @@
-"use client"
+"use client";
 
-import { createFileRoute } from "@tanstack/react-router"
-import { useCallback } from "react"
-import { GameArea } from "@/components/game-area"
-import { GameHeader } from "@/components/game-header"
-import { HelpDialog } from "@/components/help-dialog"
-import { KeyboardShortcuts } from "@/components/keyboard-shortcuts"
-import { ResetConfirmDialog } from "@/components/reset-confirm-dialog"
-import { ScoreDisplay } from "@/components/score-display"
-import { SettingsDialog } from "@/components/settings-dialog"
-import { useDialogs } from "@/hooks/use-dialogs"
-import { useGameKeyboard } from "@/hooks/use-game-keyboard"
-import { useGameTimer } from "@/hooks/use-game-timer"
-import { useStoreHydrated } from "@/hooks/use-store-hydrated"
-import { useGameStore } from "@/stores/game"
-import { getCardById } from "@/data/taboo-cards"
-import { cn } from "@/utils/cn"
+import { createFileRoute } from "@tanstack/react-router";
+import { useCallback, useMemo } from "react";
+import { useTimer } from "react-timer-hook";
+import { GameArea } from "@/components/game-area";
+import { GameHeader } from "@/components/game-header";
+import { HelpDialog } from "@/components/dialogs/help-dialog";
+import { ResetConfirmDialog } from "@/components/dialogs/reset-confirm-dialog";
+import { SettingsDialog } from "@/components/dialogs/settings-dialog";
+import { KeyboardShortcuts } from "@/components/keyboard-shortcuts";
+import { ScoreDisplay } from "@/components/score-display";
+import { useDialogs } from "@/hooks/use-dialogs";
+import { useGameKeyboard } from "@/hooks/use-game-keyboard";
+import { useStoreHydrated } from "@/hooks/use-store-hydrated";
+import { useGameStore } from "@/stores/game";
+import { getCardById } from "@/data/taboo-cards";
+import { cn } from "@/utils/cn";
 
 export const Route = createFileRoute("/")({
   component: TabooGame,
-})
+});
 
 function TabooGame() {
-  const dialogs = useDialogs()
-  const hydrated = useStoreHydrated()
+  const dialogs = useDialogs();
+  const hydrated = useStoreHydrated();
 
   const {
     teams,
     currentTeamIndex,
     gameStarted,
     currentCardId,
-    isPaused,
+    usedCardIds,
+    previewingPrevious,
     roundNumber,
     settings,
-    endAt,
-    pausedMs,
-    togglePause,
+    togglePreviewPrevious,
     startRound,
     handleCorrect,
     handleSkip,
     endRound,
     resetGame,
-  } = useGameStore()
+  } = useGameStore();
 
-  const timeRemaining = useGameTimer({
-    endAt,
-    pausedMs,
-    fallbackSeconds: settings.timerDuration,
+  // Placeholder expiry — useTimer needs an initial value, but autoStart is
+  // false and handleStartRound calls restart() with a fresh expiry on every
+  // round, so this is never actually counted down from.
+  const initialExpiry = useMemo(
+    () => new Date(Date.now() + settings.timerDuration * 1000),
+    [settings.timerDuration],
+  );
+  const { totalSeconds, isRunning, pause, resume, restart } = useTimer({
+    expiryTimestamp: initialExpiry,
+    autoStart: false,
     onExpire: endRound,
-  })
+  });
 
-  const openSettings = useCallback(() => dialogs.open("settings"), [dialogs])
-  const openHelp = useCallback(() => dialogs.open("help"), [dialogs])
-  const openReset = useCallback(() => dialogs.open("reset"), [dialogs])
+  const isPaused = gameStarted && !isRunning;
+
+  const handleStartRound = useCallback(() => {
+    startRound();
+    restart(new Date(Date.now() + settings.timerDuration * 1000), true);
+  }, [restart, settings.timerDuration, startRound]);
+
+  const handleTogglePause = useCallback(() => {
+    if (!gameStarted) return;
+    if (isRunning) pause();
+    else resume();
+  }, [gameStarted, isRunning, pause, resume]);
+
+  const openSettings = useCallback(() => dialogs.open("settings"), [dialogs]);
+  const openHelp = useCallback(() => dialogs.open("help"), [dialogs]);
+  const openReset = useCallback(() => dialogs.open("reset"), [dialogs]);
 
   useGameKeyboard({
     onCorrect: handleCorrect,
     onSkip: handleSkip,
-    onPause: togglePause,
+    onPause: handleTogglePause,
     onOpenHelp: openHelp,
+    onStartRound: handleStartRound,
+    onPreviewPrevious: togglePreviewPrevious,
     gameStarted,
     isPaused,
-  })
+  });
 
-  const currentTeam = teams[currentTeamIndex]
-  const currentCard = currentCardId === null ? null : getCardById(currentCardId) ?? null
-  const hasPlayed = roundNumber > 0
+  const currentTeam = teams[currentTeamIndex];
+  const currentCard = currentCardId === null ? null : (getCardById(currentCardId) ?? null);
+  const previousCardId =
+    previewingPrevious && usedCardIds.length >= 2 ? usedCardIds[usedCardIds.length - 2] : null;
+  const previousCard =
+    previousCardId === null || previousCardId === undefined
+      ? null
+      : (getCardById(previousCardId) ?? null);
+  const hasPlayed = roundNumber > 0;
+
+  const timeRemaining = gameStarted ? totalSeconds : settings.timerDuration;
 
   return (
     <main className="mx-auto flex min-h-dvh max-w-2xl flex-col px-6 pt-12 pb-8 lg:max-w-3xl lg:py-8">
@@ -90,15 +118,16 @@ function TabooGame() {
           gameStarted={gameStarted}
           isPaused={isPaused}
           currentCard={currentCard}
+          previousCard={previousCard}
           hasPlayed={hasPlayed}
           onCorrect={handleCorrect}
           onSkip={handleSkip}
-          onStartRound={startRound}
+          onStartRound={handleStartRound}
         />
       </div>
 
       <footer className="mt-12">
-        <KeyboardShortcuts />
+        <KeyboardShortcuts isPaused={isPaused} />
       </footer>
 
       {hydrated ? (
@@ -108,10 +137,7 @@ function TabooGame() {
             onOpenChange={dialogs.toggle("settings")}
             onResetRequest={openReset}
           />
-          <HelpDialog
-            open={dialogs.isOpen("help")}
-            onOpenChange={dialogs.toggle("help")}
-          />
+          <HelpDialog open={dialogs.isOpen("help")} onOpenChange={dialogs.toggle("help")} />
           <ResetConfirmDialog
             open={dialogs.isOpen("reset")}
             onOpenChange={dialogs.toggle("reset")}
@@ -120,5 +146,5 @@ function TabooGame() {
         </>
       ) : null}
     </main>
-  )
+  );
 }

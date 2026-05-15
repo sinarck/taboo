@@ -1,24 +1,26 @@
-"use client"
+"use client";
 
-import { GameCard } from "@/components/game-card"
-import { Rules } from "@/components/rules"
-import { Button } from "@/components/ui/button"
-import type { TabooCard } from "@/data/taboo-cards"
+import { GameCard } from "@/components/game-card";
+import { Rules } from "@/components/rules";
+import { Button } from "@/components/ui/button";
+import type { TabooCard } from "@/data/taboo-cards";
 
 type GameAreaProps = {
-  gameStarted: boolean
-  isPaused: boolean
-  currentCard: TabooCard | null
-  hasPlayed: boolean
-  onCorrect: () => void
-  onSkip: () => void
-  onStartRound: () => void
-}
+  gameStarted: boolean;
+  isPaused: boolean;
+  currentCard: TabooCard | null;
+  previousCard: TabooCard | null;
+  hasPlayed: boolean;
+  onCorrect: () => void;
+  onSkip: () => void;
+  onStartRound: () => void;
+};
 
 export function GameArea({
   gameStarted,
   isPaused,
   currentCard,
+  previousCard,
   hasPlayed,
   onCorrect,
   onSkip,
@@ -27,12 +29,23 @@ export function GameArea({
   if (gameStarted && isPaused) {
     return (
       <section id="main-content" className="text-center">
-        <h2 className="text-2xl font-semibold tracking-tight">Round paused</h2>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Press <kbd className="kbd">P</kbd> to resume
-        </p>
+        {previousCard ? (
+          <>
+            <GameCard card={previousCard} />
+            <p className="mt-4 text-xs uppercase tracking-wider text-muted-foreground">
+              Previous card · paused
+            </p>
+          </>
+        ) : (
+          <>
+            <h2 className="text-2xl font-semibold tracking-tight">Round paused</h2>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Press <kbd className="kbd">P</kbd> to resume
+            </p>
+          </>
+        )}
       </section>
-    )
+    );
   }
 
   if (gameStarted && currentCard) {
@@ -48,14 +61,14 @@ export function GameArea({
           </Button>
         </div>
       </section>
-    )
+    );
   }
 
   if (!hasPlayed) {
     return (
       <section id="main-content" className="space-y-8">
-        <div>
-          <h2 className="section-label mb-3">How to play</h2>
+        <div className="w-full rounded-xl border border-border bg-muted/30 p-5">
+          <h2 className="section-label mb-4">How to play</h2>
           <Rules />
         </div>
         <div className="flex justify-center">
@@ -64,7 +77,7 @@ export function GameArea({
           </Button>
         </div>
       </section>
-    )
+    );
   }
 
   return (
@@ -73,5 +86,5 @@ export function GameArea({
         Start round
       </Button>
     </section>
-  )
+  );
 }
