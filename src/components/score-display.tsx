@@ -1,19 +1,19 @@
-"use client"
+"use client";
 
-import { cn } from "@/utils/cn"
-import type { Team } from "@/types/game"
+import { cn } from "@/utils/cn";
+import type { Team } from "@/types/game";
 
 type ScoreDisplayProps = {
-  teams: Team[]
-  currentTeamIndex: number
-}
+  teams: Team[];
+  currentTeamIndex: number;
+};
 
 export function ScoreDisplay({ teams, currentTeamIndex }: ScoreDisplayProps) {
   return (
     <section aria-label="Scoreboard">
       <ul className="flex flex-wrap items-end justify-center gap-x-10 gap-y-6 sm:gap-x-14">
         {teams.map((team, index) => {
-          const isActive = index === currentTeamIndex
+          const isActive = index === currentTeamIndex;
           return (
             <li key={team.id} className="text-center">
               <p
@@ -33,9 +33,9 @@ export function ScoreDisplay({ teams, currentTeamIndex }: ScoreDisplayProps) {
                 {team.score}
               </p>
             </li>
-          )
+          );
         })}
       </ul>
     </section>
-  )
+  );
 }
