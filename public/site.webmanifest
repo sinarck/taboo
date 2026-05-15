@@ -1,7 +1,9 @@
 {
-  "name": "Taboo — The Forbidden Word Party Game",
+  "name": "Taboo",
   "short_name": "Taboo",
-  "description": "Play Taboo online with friends. Describe the word on the card without using any of the forbidden words.",
+  "description": "Play Taboo online. Get your team to guess the word without saying any of the five forbidden words.",
+  "lang": "en",
+  "dir": "ltr",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
