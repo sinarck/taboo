@@ -1,39 +1,85 @@
-import { siteMetadata } from "@/config/site";
+import { absoluteUrl, siteMetadata } from "@/config/site";
 
-const ogImageUrl = `${siteMetadata.origin}${siteMetadata.socialImage.path}`;
+const ogImageUrl = absoluteUrl(siteMetadata.socialImage.path);
 
-// JSON-LD blocks for the homepage. Two graphs: WebSite for sitelinks
-// search-box eligibility, plus a combined Game/WebApplication entry so
-// crawlers can classify the experience as a multiplayer party game.
-export const structuredData = [
-  {
-    "@context": "https://schema.org",
-    "@type": "WebSite",
-    name: siteMetadata.name,
-    url: siteMetadata.origin,
-    description: siteMetadata.description,
-    inLanguage: "en",
-  },
-  {
-    "@context": "https://schema.org",
-    "@type": ["Game", "WebApplication"],
-    name: siteMetadata.name,
-    alternateName: "Taboo Online",
-    description: siteMetadata.description,
-    url: siteMetadata.origin,
-    image: ogImageUrl,
-    applicationCategory: "GameApplication",
-    applicationSubCategory: "Party Game",
-    genre: ["Party", "Word", "Family"],
-    gamePlatform: "Web Browser",
-    numberOfPlayers: {
-      "@type": "QuantitativeValue",
-      minValue: 2,
-      maxValue: 16,
+const websiteId = `${siteMetadata.origin}/#website`;
+const webpageId = `${siteMetadata.origin}/#webpage`;
+const appId = `${siteMetadata.origin}/#webapp`;
+const imageId = `${ogImageUrl}#primaryimage`;
+
+export const structuredData = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": websiteId,
+      name: siteMetadata.name,
+      alternateName: "Taboo Online",
+      url: siteMetadata.origin,
+      description: siteMetadata.description,
+      inLanguage: siteMetadata.language,
     },
-    playMode: "MultiPlayer",
-    operatingSystem: "Web Browser",
-    browserRequirements: "Requires JavaScript. Works on modern browsers.",
-    inLanguage: "en",
-  },
-];
+    {
+      "@type": "WebPage",
+      "@id": webpageId,
+      url: siteMetadata.origin,
+      name: siteMetadata.title,
+      description: siteMetadata.description,
+      dateModified: siteMetadata.lastModified,
+      isPartOf: {
+        "@id": websiteId,
+      },
+      primaryImageOfPage: {
+        "@id": imageId,
+      },
+      mainEntity: {
+        "@id": appId,
+      },
+      inLanguage: siteMetadata.language,
+    },
+    {
+      "@type": "ImageObject",
+      "@id": imageId,
+      url: ogImageUrl,
+      contentUrl: ogImageUrl,
+      width: siteMetadata.socialImage.width,
+      height: siteMetadata.socialImage.height,
+      caption: siteMetadata.socialImage.alt,
+      inLanguage: siteMetadata.language,
+    },
+    {
+      "@type": ["WebApplication", "Game"],
+      "@id": appId,
+      name: siteMetadata.name,
+      alternateName: ["Taboo Online", "Free Taboo Game"],
+      description: siteMetadata.description,
+      url: siteMetadata.origin,
+      image: {
+        "@id": imageId,
+      },
+      applicationCategory: "GameApplication",
+      applicationSubCategory: "Party Game",
+      genre: ["Party", "Word", "Family"],
+      gamePlatform: "Web Browser",
+      operatingSystem: "Any",
+      browserRequirements: "Requires JavaScript. Works on modern browsers.",
+      isAccessibleForFree: true,
+      offers: {
+        "@type": "Offer",
+        price: "0",
+        priceCurrency: "USD",
+        availability: "https://schema.org/InStock",
+      },
+      audience: {
+        "@type": "PeopleAudience",
+        suggestedMinAge: 8,
+      },
+      numberOfPlayers: {
+        "@type": "QuantitativeValue",
+        minValue: 2,
+      },
+      playMode: "MultiPlayer",
+      inLanguage: siteMetadata.language,
+    },
+  ],
+} as const;
