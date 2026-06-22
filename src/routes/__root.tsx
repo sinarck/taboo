@@ -2,11 +2,11 @@
 
 import { HeadContent, Outlet, Scripts, createRootRoute } from "@tanstack/react-router";
 import { Analytics } from "@vercel/analytics/react";
-import { siteMetadata } from "@/config/site";
+import { absoluteUrl, siteMetadata } from "@/config/site";
 import { structuredData } from "@/config/structured-data";
 import appCss from "../styles.css?url";
 
-const ogImageUrl = `${siteMetadata.origin}${siteMetadata.socialImage.path}`;
+const ogImageUrl = absoluteUrl(siteMetadata.socialImage.path);
 
 export const Route = createRootRoute({
   head: () => ({
@@ -18,10 +18,11 @@ export const Route = createRootRoute({
       },
       { title: siteMetadata.title },
       { name: "description", content: siteMetadata.description },
-      { name: "keywords", content: siteMetadata.keywords.join(", ") },
       { name: "robots", content: siteMetadata.robots },
       { name: "googlebot", content: siteMetadata.robots },
       { name: "author", content: siteMetadata.name },
+      { name: "creator", content: siteMetadata.name },
+      { name: "publisher", content: siteMetadata.name },
       { name: "application-name", content: siteMetadata.name },
       { name: "apple-mobile-web-app-title", content: siteMetadata.shortTitle },
       { name: "apple-mobile-web-app-capable", content: "yes" },
@@ -45,6 +46,7 @@ export const Route = createRootRoute({
       { property: "og:title", content: siteMetadata.socialTitle },
       { property: "og:description", content: siteMetadata.description },
       { property: "og:url", content: siteMetadata.origin },
+      { property: "og:updated_time", content: siteMetadata.lastModified },
       { property: "og:image", content: ogImageUrl },
       { property: "og:image:secure_url", content: ogImageUrl },
       { property: "og:image:width", content: String(siteMetadata.socialImage.width) },
@@ -54,6 +56,7 @@ export const Route = createRootRoute({
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: siteMetadata.socialTitle },
       { name: "twitter:description", content: siteMetadata.description },
+      { name: "twitter:url", content: siteMetadata.origin },
       { name: "twitter:image", content: ogImageUrl },
       { name: "twitter:image:alt", content: siteMetadata.socialImage.alt },
     ],
