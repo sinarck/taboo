@@ -1,150 +1,91 @@
-"use client";
+import { ClientOnly, createFileRoute } from "@tanstack/react-router";
+import { Suspense, lazy } from "react";
+import { gameRules } from "@/config/rules";
+import { siteMetadata } from "@/config/site";
 
-import { createFileRoute } from "@tanstack/react-router";
-import { useCallback, useMemo } from "react";
-import { useTimer } from "react-timer-hook";
-import { GameArea } from "@/components/game-area";
-import { GameHeader } from "@/components/game-header";
-import { HelpDialog } from "@/components/dialogs/help-dialog";
-import { ResetConfirmDialog } from "@/components/dialogs/reset-confirm-dialog";
-import { SettingsDialog } from "@/components/dialogs/settings-dialog";
-import { KeyboardShortcuts } from "@/components/keyboard-shortcuts";
-import { ScoreDisplay } from "@/components/score-display";
-import { useDialogs } from "@/hooks/use-dialogs";
-import { useGameKeyboard } from "@/hooks/use-game-keyboard";
-import { useStoreHydrated } from "@/hooks/use-store-hydrated";
-import { useGameStore } from "@/stores/game";
-import { getCardById } from "@/data/taboo-cards";
-import { cn } from "@/utils/cn";
+const TabooGame = lazy(() =>
+  import("@/components/taboo-game").then((module) => ({ default: module.TabooGame })),
+);
 
 export const Route = createFileRoute("/")({
-  component: TabooGame,
+  head: () => ({
+    meta: [
+      { title: siteMetadata.title },
+      { name: "description", content: siteMetadata.description },
+      { name: "keywords", content: siteMetadata.keywords.join(", ") },
+      { property: "og:title", content: siteMetadata.socialTitle },
+      { property: "og:description", content: siteMetadata.description },
+      { property: "og:url", content: siteMetadata.origin },
+      { name: "twitter:title", content: siteMetadata.socialTitle },
+      { name: "twitter:description", content: siteMetadata.description },
+      { name: "twitter:url", content: siteMetadata.origin },
+    ],
+    links: [{ rel: "canonical", href: siteMetadata.origin }],
+  }),
+  component: HomePage,
 });
 
-function TabooGame() {
-  const dialogs = useDialogs();
-  const hydrated = useStoreHydrated();
-
-  const {
-    teams,
-    currentTeamIndex,
-    gameStarted,
-    currentCardId,
-    usedCardIds,
-    previewingPrevious,
-    roundNumber,
-    settings,
-    togglePreviewPrevious,
-    startRound,
-    handleCorrect,
-    handleSkip,
-    endRound,
-    resetGame,
-  } = useGameStore();
-
-  // Placeholder expiry — useTimer needs an initial value, but autoStart is
-  // false and handleStartRound calls restart() with a fresh expiry on every
-  // round, so this is never actually counted down from.
-  const initialExpiry = useMemo(
-    () => new Date(Date.now() + settings.timerDuration * 1000),
-    [settings.timerDuration],
-  );
-  const { totalSeconds, isRunning, pause, resume, restart } = useTimer({
-    expiryTimestamp: initialExpiry,
-    autoStart: false,
-    onExpire: endRound,
-  });
-
-  const isPaused = gameStarted && !isRunning;
-
-  const handleStartRound = useCallback(() => {
-    startRound();
-    restart(new Date(Date.now() + settings.timerDuration * 1000), true);
-  }, [restart, settings.timerDuration, startRound]);
-
-  const handleTogglePause = useCallback(() => {
-    if (!gameStarted) return;
-    if (isRunning) pause();
-    else resume();
-  }, [gameStarted, isRunning, pause, resume]);
-
-  const openSettings = useCallback(() => dialogs.open("settings"), [dialogs]);
-  const openHelp = useCallback(() => dialogs.open("help"), [dialogs]);
-  const openReset = useCallback(() => dialogs.open("reset"), [dialogs]);
-
-  useGameKeyboard({
-    onCorrect: handleCorrect,
-    onSkip: handleSkip,
-    onPause: handleTogglePause,
-    onOpenHelp: openHelp,
-    onStartRound: handleStartRound,
-    onPreviewPrevious: togglePreviewPrevious,
-    gameStarted,
-    isPaused,
-  });
-
-  const currentTeam = teams[currentTeamIndex];
-  const currentCard = currentCardId === null ? null : (getCardById(currentCardId) ?? null);
-  const previousCardId =
-    previewingPrevious && usedCardIds.length >= 2 ? usedCardIds[usedCardIds.length - 2] : null;
-  const previousCard =
-    previousCardId === null || previousCardId === undefined
-      ? null
-      : (getCardById(previousCardId) ?? null);
-  const hasPlayed = roundNumber > 0;
-
-  const timeRemaining = gameStarted ? totalSeconds : settings.timerDuration;
-
+function HomePage() {
   return (
-    <main className="mx-auto flex min-h-dvh max-w-2xl flex-col px-6 pt-12 pb-8 lg:max-w-3xl lg:py-8">
-      <GameHeader
-        gameStarted={gameStarted && hydrated}
-        hasPlayed={hasPlayed && hydrated}
-        activeTeamName={currentTeam?.name}
-        timeRemaining={timeRemaining}
-        onOpenSettings={openSettings}
-        onOpenHelp={openHelp}
-      />
+    <ClientOnly fallback={<SeoGameShell />}>
+      <Suspense fallback={null}>
+        <TabooGame />
+      </Suspense>
+    </ClientOnly>
+  );
+}
 
-      <div
-        className={cn(
-          "flex flex-1 flex-col justify-center gap-12 transition-opacity duration-150",
-          !hydrated && "invisible",
-        )}
-      >
-        <ScoreDisplay teams={teams} currentTeamIndex={currentTeamIndex} />
+function SeoGameShell() {
+  return (
+    <main
+      id="main-content"
+      className="mx-auto flex min-h-dvh max-w-2xl flex-col px-6 pt-12 pb-8 lg:max-w-3xl lg:py-8"
+    >
+      <header className="mb-10 flex items-center justify-between lg:mb-8">
+        <h1 className="text-base font-semibold tracking-tight">{siteMetadata.name}</h1>
+      </header>
 
-        <GameArea
-          gameStarted={gameStarted}
-          isPaused={isPaused}
-          currentCard={currentCard}
-          previousCard={previousCard}
-          hasPlayed={hasPlayed}
-          onCorrect={handleCorrect}
-          onSkip={handleSkip}
-          onStartRound={handleStartRound}
-        />
+      <div className="flex flex-1 flex-col justify-center gap-12">
+        <section aria-label="Scoreboard">
+          <ul className="flex flex-wrap items-end justify-center gap-x-10 gap-y-6 sm:gap-x-14">
+            {["Team 1", "Team 2"].map((team, index) => (
+              <li key={team} className="text-center">
+                <p className={index === 0 ? "section-label text-foreground" : "section-label"}>
+                  {team}
+                </p>
+                <p className="mt-1 text-5xl font-bold tabular tracking-tight sm:text-6xl">0</p>
+              </li>
+            ))}
+          </ul>
+        </section>
+
+        <section className="space-y-8">
+          <div className="w-full rounded-xl border border-border bg-muted/30 p-5">
+            <h2 className="section-label mb-4">How to play</h2>
+            <ol className="space-y-3.5">
+              {gameRules.map((rule, index) => (
+                <li key={rule.title} className="flex items-start gap-3">
+                  <span
+                    className="tabular mt-0.5 grid size-6 shrink-0 place-items-center rounded-full border border-border bg-muted/40 text-muted-foreground text-xs font-medium"
+                    aria-hidden="true"
+                  >
+                    {index + 1}
+                  </span>
+                  <div className="space-y-0.5 leading-snug">
+                    <p className="text-sm font-medium text-foreground">{rule.title}</p>
+                    <p className="text-sm text-muted-foreground">{rule.body}</p>
+                  </div>
+                </li>
+              ))}
+            </ol>
+          </div>
+          <div className="flex justify-center">
+            <button className="inline-flex h-11 items-center justify-center rounded-md bg-primary px-6 text-primary-foreground text-sm font-medium">
+              Start round
+            </button>
+          </div>
+        </section>
       </div>
-
-      <footer className="mt-12">
-        <KeyboardShortcuts isPaused={isPaused} />
-      </footer>
-
-      {hydrated ? (
-        <>
-          <SettingsDialog
-            open={dialogs.isOpen("settings")}
-            onOpenChange={dialogs.toggle("settings")}
-            onResetRequest={openReset}
-          />
-          <HelpDialog open={dialogs.isOpen("help")} onOpenChange={dialogs.toggle("help")} />
-          <ResetConfirmDialog
-            open={dialogs.isOpen("reset")}
-            onOpenChange={dialogs.toggle("reset")}
-            onConfirm={resetGame}
-          />
-        </>
-      ) : null}
     </main>
   );
 }

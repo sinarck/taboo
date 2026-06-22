@@ -4,12 +4,12 @@ import { useEffect, useState } from "react";
 import { useGameStore } from "@/stores/game";
 
 export function useStoreHydrated(): boolean {
-  const [hydrated, setHydrated] = useState(() => useGameStore.persist.hasHydrated());
+  const [hydrated, setHydrated] = useState(() => useGameStore.persist?.hasHydrated() ?? true);
 
   useEffect(() => {
     if (hydrated) return;
-    const unsub = useGameStore.persist.onFinishHydration(() => setHydrated(true));
-    setHydrated(useGameStore.persist.hasHydrated());
+    const unsub = useGameStore.persist?.onFinishHydration(() => setHydrated(true));
+    setHydrated(useGameStore.persist?.hasHydrated() ?? true);
     return unsub;
   }, [hydrated]);
 
