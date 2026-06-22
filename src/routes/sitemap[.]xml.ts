@@ -1,30 +1,28 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { siteMetadata } from "@/config/site";
+import { absoluteUrl, siteMetadata } from "@/config/site";
 
 type SitemapEntry = {
   readonly path: string;
   readonly changefreq?: "always" | "hourly" | "daily" | "weekly" | "monthly" | "yearly" | "never";
+  readonly lastmod?: string;
   readonly priority?: number;
 };
 
 const entries: readonly SitemapEntry[] = [{ path: "/", changefreq: "monthly", priority: 1.0 }];
 
 // Served as `/sitemap.xml`. Built from `entries` above so adding a route is
-// a one-line change. Lastmod uses build/request time which is good enough
-// for a single-page game; bump this manually if a static asset changes
-// in a way crawlers should re-fetch.
+// a one-line change.
 export const Route = createFileRoute("/sitemap.xml")({
   server: {
     handlers: {
       GET: () => {
-        const lastmod = new Date().toISOString();
         const urls = entries
           .map((entry) => {
-            const loc = `${siteMetadata.origin}${entry.path}`;
+            const loc = absoluteUrl(entry.path);
             const lines = [
               "  <url>",
-              `    <loc>${loc}</loc>`,
-              `    <lastmod>${lastmod}</lastmod>`,
+              `    <loc>${escapeXml(loc)}</loc>`,
+              `    <lastmod>${entry.lastmod ?? siteMetadata.lastModified}</lastmod>`,
               entry.changefreq ? `    <changefreq>${entry.changefreq}</changefreq>` : null,
               entry.priority !== undefined
                 ? `    <priority>${entry.priority.toFixed(1)}</priority>`
@@ -51,3 +49,12 @@ ${urls}
     },
   },
 });
+
+function escapeXml(value: string) {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&apos;");
+}

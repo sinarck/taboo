@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { siteMetadata } from "@/config/site";
+import { absoluteUrl } from "@/config/site";
 
 // Served as `/robots.txt`. The `[.]` in the file name is TanStack Router's
 // escape for a literal dot inside a path segment.
@@ -11,7 +11,7 @@ export const Route = createFileRoute("/robots.txt")({
           "User-agent: *",
           "Allow: /",
           "",
-          `Sitemap: ${siteMetadata.origin}/sitemap.xml`,
+          `Sitemap: ${absoluteUrl("/sitemap.xml")}`,
           "",
         ].join("\n");
 
