@@ -49,7 +49,9 @@ export const siteMetadata = {
 } as const;
 
 export const absoluteUrl = (path = "/") =>
-  path.startsWith("http") ? path : `${siteMetadata.origin}${path.startsWith("/") ? path : `/${path}`}`;
+  path.startsWith("http")
+    ? path
+    : `${siteMetadata.origin}${path.startsWith("/") ? path : `/${path}`}`;
 
 export const formatTitle = (page?: string) =>
   page ? `${page} | ${siteMetadata.name}` : siteMetadata.title;
